@@ -1,0 +1,1 @@
+{"root":["./src/base.ts","./src/client.ts","./src/config.ts","./src/index.ts","./src/server.ts","./src/validation.ts","./src/backend/index.ts","./src/frontend/index.ts","./src/react/hooks.ts","./src/react/index.ts","./src/react/provider.tsx"],"version":"5.9.3"}
