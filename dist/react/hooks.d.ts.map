@@ -1,0 +1,1 @@
+{"version":3,"file":"hooks.d.ts","sourceRoot":"","sources":["../../src/react/hooks.ts"],"names":[],"mappings":"AAGA,OAAO,KAAK,EAAE,kBAAkB,EAAE,aAAa,EAAE,MAAM,YAAY,CAAC;AAGpE;;;GAGG;AACH,wBAAgB,MAAM;;;;;;;;;;oBAkDqB,kBAAkB;0BAiBZ,aAAa,KAAG,OAAO,CAAC,MAAM,GAAG,IAAI,CAAC;eAjExE,OAAO;WACX,MAAM,GAAG,IAAI;EAuFvB"}
