@@ -6,9 +6,9 @@ description: "Browser-side API for starting the Mio OAuth flow and calling the L
 ## Initialization
 
 ```typescript
-import { MioClientSDK } from '@mio/mio-sdk';
+import { Mio } from '@mio/mio-sdk';
 
-const client = MioClientSDK.init({
+const client = Mio.init({
   clientId: process.env.NEXT_PUBLIC_MIO_CLIENT_ID!,
   redirectUrl: `${process.env.NEXT_PUBLIC_APP_URL}/api/mio/callback`,
   exchangeTokenUrl: '/api/exchange-token'
@@ -16,7 +16,7 @@ const client = MioClientSDK.init({
 ```
 
 <Warning>
-  `MioClientSDK.init` throws if you call it more than once per browser session. Use `MioClientSDK.getInstance()` (or `useMio`) everywhere after the initial call.
+  `Mio.init` throws if you call it more than once per browser session. Use `Mio.getInstance()` (or `useMio`) everywhere after the initial call.
 </Warning>
 
 ### Config parameters
@@ -80,7 +80,7 @@ Token returned by `handleMioCallback` or your backend.
 
 <RequestExample>
 ```typescript
-const response = await MioClientSDK.getInstance().chat({
+const response = await Mio.getInstance().chat({
   query: 'Summarize the user profile',
   accessToken
 });
@@ -101,7 +101,7 @@ Fetches the latest LLM-generated user summary. Returns `null` when no summary ex
 
 <AccordionGroup>
   <Accordion title="Not initialized">
-    `MioClientSDK.getInstance()` throws if you skip `MioClientSDK.init`. Initialize inside a provider or at app bootstrap.
+    `Mio.getInstance()` throws if you skip `Mio.init`. Initialize inside a provider or at app bootstrap.
   </Accordion>
   <Accordion title="Token exchange failed">
     `exchangeCode` throws when the backend responds with a non-2xx status. Check that `exchangeTokenUrl` is reachable and that your backend logs show the real auth error.

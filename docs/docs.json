@@ -14,24 +14,11 @@
         "tab": "Guides",
         "groups": [
           {
-            "group": "Overview",
+        "group": "Getting started",
             "pages": [
               "index",
               "quickstart",
-              "guides/architecture"
-            ]
-          },
-          {
-            "group": "Frontend",
-            "pages": [
-              "guides/frontend",
-              "guides/react-llm"
-            ]
-          },
-          {
-            "group": "Backend",
-            "pages": [
-              "guides/backend"
+          "guides/overview"
             ]
           }
         ]

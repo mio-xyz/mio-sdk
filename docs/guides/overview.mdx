@@ -1,0 +1,56 @@
+---
+title: "Overview"
+description: "Get a high-level look at how Mio connects the user experience, your backend, and personalized Mio Context."
+---
+
+<Info>
+  This page is intentionally non-technical so you can align product, engineering, and design on how Mio behaves before you dive into the Quickstart.
+</Info>
+
+## How the integration flows
+
+1. **Invite the user** – your interface launches the OAuth consent screen hosted by Mio. Users review what Mio will read (email + calendar) before approving.
+2. **Confirm the connection** – Mio redirects back to your redirect URL with a short-lived authorization code. The browser keeps minimal state.
+3. **Exchange and store** – your backend trades the code for durable tokens, encrypts the refresh token, and associates everything with the current account.
+4. **Get Mio Context** – whenever you need personalized output, your backend or front-end asks Mio for context and passes it into your own prompts, emails, or experience.
+5. **Refresh in the background** – the backend renews tokens on a schedule so users stay connected without repeating OAuth.
+
+<Tip>
+  Align on ownership early: the browser handles UX, the backend safeguards secrets, and Mio’s context layer returns ready-to-use insights about each user.
+</Tip>
+
+## Responsibilities at a glance
+
+<Columns cols={3}>
+  <Card title="Client" icon="laptop">
+    Hosts buttons, callbacks, and any immediate feedback to the user. It only keeps short-lived state (e.g., “connected”).
+  </Card>
+  <Card title="Backend" icon="server">
+    Stores secrets, exchanges codes, refreshes tokens, and decides how to persist Mio context or trigger downstream jobs.
+  </Card>
+  <Card title="Mio Context" icon="comments">
+    Receives authenticated requests, turns signals from tools like email and calendar into structured facts, and returns a tailored context object or summary you can plug into any workflow.
+  </Card>
+</Columns>
+
+## Security checkpoints
+
+<AccordionGroup>
+  <Accordion title="Protect credentials">
+    Keep your Mio client secret environment variable in a secret manager and never expose it to the browser.
+  </Accordion>
+  <Accordion title="Require HTTPS">
+    Use HTTPS for redirect URLs, token exchange routes, and any endpoint that proxies Mio traffic.
+  </Accordion>
+  <Accordion title="Handle refresh tokens carefully">
+    Encrypt refresh tokens at rest, rotate periodically, and delete them immediately if you revoke access in the Mio dashboard.
+  </Accordion>
+  <Accordion title="Guard your context surface">
+    Apply rate limiting or authentication to any proxy endpoint that forwards Mio Context lookups on behalf of thin clients.
+  </Accordion>
+</AccordionGroup>
+
+## Ready to build?
+
+- Read the [Quickstart](/quickstart) when you are ready to implement the browser → server → Mio Context flow.
+- Jump into the [API reference](/api-reference/client-sdk) for parameters, error codes, and advanced configuration once the basics work.
