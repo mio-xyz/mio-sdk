@@ -1,4 +1,4 @@
-import type { ChatRequestOptions, MioSDKOptions } from '../base.js';
+import type { GetContextRequestOptions, MioSDKOptions } from '../base.js';
 /**
  * React hook for Mio authentication and API access
  * Handles OAuth callback flow internally for seamless integration
@@ -13,8 +13,8 @@ export declare function useMio(): {
         tokenType: string;
         refreshToken: string;
     }>;
-    chat: (options: ChatRequestOptions) => Promise<string>;
-    getSummary: (options: MioSDKOptions) => Promise<string | null>;
+    getContext: (options: GetContextRequestOptions) => Promise<string>;
+    getContextSummary: (options: MioSDKOptions) => Promise<string | null>;
     isLoading: boolean;
     error: string | null;
 };

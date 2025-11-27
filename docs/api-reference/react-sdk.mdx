@@ -42,10 +42,10 @@ Backend endpoint that swaps authorization codes for tokens.
 
 ## Hook: `useMio()`
 
-Returns state helpers for driving the OAuth flow and LLM calls.
+Returns state helpers for driving the OAuth flow and Mio Context lookups.
 
 <ResponseField name="isLoading" type="boolean" required>
-True while a request (connect, callback, chat, summary) is in flight.
+True while a request (connect, callback, context, summary) is in flight.
 </ResponseField>
 <ResponseField name="error" type="string | null" required>
 Last error message produced by the hook.
@@ -56,11 +56,11 @@ Kicks off the OAuth flow. Redirects immediately.
 <ResponseField name="handleMioCallback" type="() => Promise<MioOauth2TokenResponse>" required>
 Parses the authorization code and exchanges it via the configured backend.
 </ResponseField>
-<ResponseField name="chat" type="(options: ChatRequestOptions) => Promise<string>" required>
-Calls the LLM with the provided query.
+<ResponseField name="getContext" type="(options: GetContextRequestOptions) => Promise<string>" required>
+Fetches Mio Context for the given user and query.
 </ResponseField>
-<ResponseField name="getSummary" type="(options: MioSDKOptions) => Promise<string | null>" required>
-Fetches the latest summary for the user.
+<ResponseField name="getContextSummary" type="(options: MioSDKOptions) => Promise<string | null>" required>
+Fetches the latest stored Mio Context summary for the user.
 </ResponseField>
 
 ### Example usage
@@ -72,7 +72,7 @@ import { useEffect, useState } from 'react';
 import { useMio } from '@mio/mio-sdk/react';
 
 export function MioActions() {
-  const { connect, handleMioCallback, chat, isLoading, error } = useMio();
+  const { connect, handleMioCallback, getContext, isLoading, error } = useMio();
   const [accessToken, setAccessToken] = useState<string | null>(null);
 
   useEffect(() => {
@@ -87,10 +87,10 @@ export function MioActions() {
         {isLoading ? 'Redirecting…' : 'Connect with Mio'}
       </button>
       <button
-        onClick={() => accessToken && chat({ query: 'Greet the user', accessToken })}
+        onClick={() => accessToken && getContext({ query: 'Greet the user', accessToken })}
         disabled={!accessToken || isLoading}
       >
-        Ask the LLM
+        Get Mio Context
       </button>
       {error ? <p className="text-red-500">{error}</p> : null}
     </div>

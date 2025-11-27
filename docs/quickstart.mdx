@@ -156,7 +156,7 @@ export function Providers({ children }: { children: ReactNode }) {
   </Step>
 
   <Step title="Fetch Mio Context & personalize your experience">
-    Use Mio helpers to manage the OAuth flow, capture tokens, and request Mio Context (via `chat` or `getSummary`) from either React or plain JavaScript.
+    Use Mio helpers to manage the OAuth flow, capture tokens, and request Mio Context (via `getContext` or `getContextSummary`) from either React or plain JavaScript.
 
 <Tabs>
 <Tab title="React">
@@ -168,7 +168,7 @@ import { useState } from 'react';
 import { useMio } from '@mio/mio-sdk/react';
 
 export default function HomePage() {
-  const { connect, handleMioCallback, chat, getSummary, isLoading, error } = useMio();
+  const { connect, handleMioCallback, getContext, getContextSummary, isLoading, error } = useMio();
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [answer, setAnswer] = useState<string | null>(null);
 
@@ -187,7 +187,7 @@ export default function HomePage() {
     if (!accessToken) {
       throw new Error('Connect first so we can get an access token');
     }
-    const response = await chat({ query: 'Summarize the user', accessToken });
+    const response = await getContext({ query: 'Summarize the user', accessToken });
     setAnswer(response);
   }
 
@@ -195,7 +195,7 @@ export default function HomePage() {
     if (!accessToken) {
       throw new Error('Connect first so we can get an access token');
     }
-    const summary = await getSummary({ accessToken });
+    const summary = await getContextSummary({ accessToken });
     setAnswer(summary ?? 'No summary returned');
   }
 
@@ -251,7 +251,7 @@ export default function HomePage() {
     if (!accessToken) {
       throw new Error('Connect first so we can get an access token');
     }
-    const response = await mio.chat({
+    const response = await mio.getContext({
       query: 'Summarize the user for a welcome email',
       accessToken
     });
@@ -262,7 +262,7 @@ export default function HomePage() {
     if (!accessToken) {
       throw new Error('Connect first so we can get an access token');
     }
-    const summary = await mio.getUserSummary({ accessToken });
+    const summary = await mio.getContextSummary({ accessToken });
     console.log('Mio user summary', summary);
   }
 
@@ -296,7 +296,7 @@ export default function HomePage() {
     </Warning>
 
     <Check>
-      Visit your redirect URL after Mio sends you back, call `handleMioCallback`, and confirm both `chat` and `getSummary` log content in the console.
+      Visit your redirect URL after Mio sends you back, call `handleMioCallback`, and confirm both `getContext` and `getContextSummary` log content in the console.
     </Check>
   </Step>
 </Steps>
@@ -305,7 +305,7 @@ export default function HomePage() {
 
 - You registered a Mio OAuth client and installed the SDK.
 - You configured environment variables and stood up a secure token exchange route.
-- You wrapped your React tree with `MioProvider`, handled the callback, and called both `chat` and `getSummary` using a real access token.
+- You wrapped your React tree with `MioProvider`, handled the callback, and called both `getContext` and `getContextSummary` using a real access token.
 
 ## Keep building
 

@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useMio } from '@mio/mio-sdk/react';
 
 export function MioButtons() {
-  const { connect, handleMioCallback, chat, isLoading } = useMio();
+  const { connect, handleMioCallback, getContext, isLoading } = useMio();
   const [accessToken, setAccessToken] = useState<string | null>(null);
 
   const connectUser = async () => {
@@ -20,7 +20,7 @@ export function MioButtons() {
 
   const ask = async () => {
     if (!accessToken) return;
-    await chat({ query: 'Draft an onboarding message', accessToken });
+    await getContext({ query: 'Draft an onboarding message', accessToken });
   };
 
   return (

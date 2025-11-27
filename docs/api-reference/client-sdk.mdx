@@ -1,6 +1,6 @@
 ---
 title: "Client SDK"
-description: "Browser-side API for starting the Mio OAuth flow and calling the LLM."
+description: "Browser-side API for starting the Mio OAuth flow and fetching Mio Context."
 ---
 
 ## Initialization
@@ -44,7 +44,7 @@ Redirects the browser to the Mio dashboard with the configured parameters. Use i
 Exposed via `useMio`. Reads the `code` query parameter, clears it from the URL, forwards it to `exchangeTokenUrl`, and returns the parsed tokens.
 
 <ResponseField name="accessToken" type="string" required>
-Bearer token used for subsequent `chat` or `getUserSummary` calls.
+Bearer token used for subsequent `getContext` or `getContextSummary` calls.
 </ResponseField>
 <ResponseField name="refreshToken" type="string" required>
 Long-lived token that allows the backend to mint a new access token.
@@ -67,12 +67,12 @@ Low-level helper that powers `handleMioCallback`. Call it manually if you want t
 Authorization code received from Mio after the user approves access.
 </ParamField>
 
-### `chat({ query, accessToken }): Promise<string>`
+### `getContext({ query, accessToken }): Promise<string>`
 
-Sends a prompt to Mio's LLM and returns the validated `content` string.
+Retrieves Mio Context for a given user and query and returns the validated context string.
 
 <ParamField body="query" type="string" required>
-Prompt or question sent to the LLM.
+Natural language query used to shape the returned Mio Context.
 </ParamField>
 <ParamField body="accessToken" type="string" required>
 Token returned by `handleMioCallback` or your backend.
@@ -80,7 +80,7 @@ Token returned by `handleMioCallback` or your backend.
 
 <RequestExample>
 ```typescript
-const response = await Mio.getInstance().chat({
+const response = await Mio.getInstance().getContext({
   query: 'Summarize the user profile',
   accessToken
 });
@@ -93,9 +93,9 @@ const response = await Mio.getInstance().chat({
 ```
 </ResponseExample>
 
-### `getUserSummary({ accessToken }): Promise<string | null>`
+### `getContextSummary({ accessToken }): Promise<string | null>`
 
-Fetches the latest LLM-generated user summary. Returns `null` when no summary exists.
+Fetches the latest stored Mio Context summary for the user. Returns `null` when no summary exists yet.
 
 ## Error handling
 
@@ -106,7 +106,7 @@ Fetches the latest LLM-generated user summary. Returns `null` when no summary ex
   <Accordion title="Token exchange failed">
     `exchangeCode` throws when the backend responds with a non-2xx status. Check that `exchangeTokenUrl` is reachable and that your backend logs show the real auth error.
   </Accordion>
-  <Accordion title="LLM request failed">
-    `chat` and `getUserSummary` throw a generic error message when the fetch returns a non-2xx code. Inspect your browser network panel to see if the access token expired (401) or if the payload was invalid (400).
+  <Accordion title="Context request failed">
+    `getContext` and `getContextSummary` throw a generic error message when the fetch returns a non-2xx code. Inspect your browser network panel to see if the access token expired (401) or if the payload was invalid (400).
   </Accordion>
 </AccordionGroup>

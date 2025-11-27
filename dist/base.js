@@ -20,7 +20,7 @@ export class BaseMioSDK {
         });
     }
     // LLM Integration using authenticated fetch
-    async chat(options) {
+    async getContext(options) {
         const response = await this.authenticatedFetch(`${this.config.mioApiUrl}/v1/context`, {
             method: 'POST',
             body: JSON.stringify({
@@ -38,7 +38,7 @@ export class BaseMioSDK {
         }
         return chatResponse;
     }
-    async getUserSummary(options) {
+    async getContextSummary(options) {
         const response = await this.authenticatedFetch(`${this.config.mioApiUrl}/v1/context/summary`, {
             method: 'GET'
         }, options.accessToken);

@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useState } from 'react';
-import type { ChatRequestOptions, MioSDKOptions } from '../base.js';
+import type { GetContextRequestOptions, MioSDKOptions } from '../base.js';
 import { MioClientSDK } from '../client.js';
 
 /**
@@ -58,10 +58,10 @@ export function useMio() {
     }
   }, []);
 
-  const chat = useCallback(async (options: ChatRequestOptions) => {
+  const getContext = useCallback(async (options: GetContextRequestOptions) => {
     setAuthState(prev => ({ ...prev, isLoading: true }));
     try {
-      const result = await MioClientSDK.getInstance().chat(options);
+      const result = await MioClientSDK.getInstance().getContext(options);
       setAuthState(prev => ({ ...prev, error: null, isLoading: false }));
       return result;
     } catch (error) {
@@ -75,10 +75,10 @@ export function useMio() {
     }
   }, []);
 
-  const getSummary = useCallback(async (options: MioSDKOptions): Promise<string | null> => {
+  const getContextSummary = useCallback(async (options: MioSDKOptions): Promise<string | null> => {
     setAuthState(prev => ({ ...prev, isLoading: true }));
     try {
-      const result = await MioClientSDK.getInstance().getUserSummary(options);
+      const result = await MioClientSDK.getInstance().getContextSummary(options);
       return result;
     } catch (error) {
       setAuthState(prev => ({
@@ -95,7 +95,7 @@ export function useMio() {
     ...authState,
     connect,
     handleMioCallback,
-    chat,
-    getSummary
+    getContext,
+    getContextSummary
   };
 }

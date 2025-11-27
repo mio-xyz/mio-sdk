@@ -3,7 +3,7 @@ import { type MioChatResponse } from './validation.js';
 export interface MioSDKOptions {
     accessToken: string;
 }
-export interface ChatRequestOptions extends MioSDKOptions {
+export interface GetContextRequestOptions extends MioSDKOptions {
     query: string;
 }
 /**
@@ -13,7 +13,7 @@ export declare abstract class BaseMioSDK {
     protected config: MioClientSDKConfig | MioServerSDKConfig;
     constructor(config: MioClientSDKInitConfig | MioServerSDKInitConfig);
     private authenticatedFetch;
-    chat(options: ChatRequestOptions): Promise<MioChatResponse>;
-    getUserSummary(options: MioSDKOptions): Promise<string | null>;
+    getContext(options: GetContextRequestOptions): Promise<MioChatResponse>;
+    getContextSummary(options: MioSDKOptions): Promise<string | null>;
 }
 //# sourceMappingURL=base.d.ts.map

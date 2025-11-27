@@ -50,10 +50,10 @@ export function useMio() {
             throw error;
         }
     }, []);
-    const chat = useCallback(async (options) => {
+    const getContext = useCallback(async (options) => {
         setAuthState(prev => ({ ...prev, isLoading: true }));
         try {
-            const result = await MioClientSDK.getInstance().chat(options);
+            const result = await MioClientSDK.getInstance().getContext(options);
             setAuthState(prev => ({ ...prev, error: null, isLoading: false }));
             return result;
         }
@@ -68,10 +68,10 @@ export function useMio() {
             setAuthState(prev => ({ ...prev, isLoading: false }));
         }
     }, []);
-    const getSummary = useCallback(async (options) => {
+    const getContextSummary = useCallback(async (options) => {
         setAuthState(prev => ({ ...prev, isLoading: true }));
         try {
-            const result = await MioClientSDK.getInstance().getUserSummary(options);
+            const result = await MioClientSDK.getInstance().getContextSummary(options);
             return result;
         }
         catch (error) {
@@ -89,8 +89,8 @@ export function useMio() {
         ...authState,
         connect,
         handleMioCallback,
-        chat,
-        getSummary
+        getContext,
+        getContextSummary
     };
 }
 //# sourceMappingURL=hooks.js.map

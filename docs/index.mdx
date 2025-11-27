@@ -17,7 +17,7 @@ Mio packages the entire OAuth-to-context loop so you can focus on product work. 
 
 1. **Connect** – start OAuth from your client experience and redirect users to the Mio dashboard.
 2. **Exchange** – hand the authorization code to your backend so it can store `refreshToken` securely and mint fresh access tokens.
-3. **Get Mio Context** – send `chat` or `getUserSummary` requests with a valid `accessToken` to retrieve rich, ready-to-use context you can feed into any assistant, email, or workflow.
+3. **Get Mio Context** – send `getContext` or `getContextSummary` requests with a valid `accessToken` to retrieve rich, ready-to-use context you can feed into any assistant, email, or workflow.
 
 <Tip>
   Prototype with the hosted defaults (`dashboard.mio.xyz`, `auth.mio.xyz`, `llm.mio.xyz`) and only override URLs when you move to a private environment.
@@ -46,7 +46,7 @@ Head over to the [Quickstart](/quickstart) to connect your OAuth client, wire th
     Install `@mio/mio-sdk`, register your OAuth client, and confirm the browser ↔ server loop works locally.
   </Step>
   <Step title="Map responsibilities">
-    Use the overview to decide when to run token refreshes, how to persist user state, and where to surface chat outputs.
+    Use the overview to decide when to run token refreshes, how to persist user state, and where to surface Mio Context in your product.
   </Step>
   <Step title="Go deep with the API reference">
     Each method documents required params, expected responses, and common failure modes with ready-to-copy snippets.

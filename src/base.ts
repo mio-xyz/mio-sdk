@@ -10,7 +10,7 @@ export interface MioSDKOptions {
   accessToken: string;
 }
 
-export interface ChatRequestOptions extends MioSDKOptions {
+export interface GetContextRequestOptions extends MioSDKOptions {
   query: string;
 }
 
@@ -44,7 +44,7 @@ export abstract class BaseMioSDK {
   }
 
   // LLM Integration using authenticated fetch
-  async chat(options: ChatRequestOptions): Promise<MioChatResponse> {
+  async getContext(options: GetContextRequestOptions): Promise<MioChatResponse> {
     const response = await this.authenticatedFetch(
       `${this.config.mioApiUrl}/v1/context`,
       {
@@ -69,7 +69,7 @@ export abstract class BaseMioSDK {
     return chatResponse;
   }
 
-  async getUserSummary(options: MioSDKOptions): Promise<string | null> {
+  async getContextSummary(options: MioSDKOptions): Promise<string | null> {
     const response = await this.authenticatedFetch(
       `${this.config.mioApiUrl}/v1/context/summary`,
       {

@@ -1,6 +1,6 @@
 ---
 title: "Server SDK"
-description: "Node.js API for exchanging codes, refreshing tokens, and proxying LLM calls."
+description: "Node.js API for exchanging codes, refreshing tokens, and proxying Mio Context lookups."
 ---
 
 ## Initialization
@@ -71,13 +71,13 @@ Mint a new access token (and refresh token) without user interaction.
 The token you persisted from the previous exchange.
 </ParamField>
 
-### `chat({ query, accessToken }): Promise<string>`
+### `getContext({ query, accessToken }): Promise<string>`
 
-Server-side wrappers share the same implementation as the client version. Use them when you run long operations or batch prompts on the backend.
+Server-side wrapper that shares the same implementation as the client version. Use it when you run long operations or batch context requests on the backend.
 
-### `getUserSummary({ accessToken }): Promise<string | null>`
+### `getContextSummary({ accessToken }): Promise<string | null>`
 
-Retrieves the latest summary object for the given user.
+Retrieves the latest Mio Context summary object for the given user.
 
 ## Error matrix
 
@@ -86,7 +86,7 @@ Retrieves the latest summary object for the given user.
 | `exchangeCodeForTokens` | `invalid_grant` | Redirect URL or client credentials mismatch |
 | `exchangeCodeForTokens` | `invalid_request` | Missing `code` body parameter |
 | `refreshTokens` | `invalid_grant` | Expired or revoked refresh token |
-| `chat`/`getUserSummary` | `401 Unauthorized` | Access token expired or malformed |
+| `getContext`/`getContextSummary` | `401 Unauthorized` | Access token expired or malformed |
 
 <Note>
   All methods throw standard `Error` objects. Wrap calls with try/catch and map them to HTTP status codes that make sense for your API surface.

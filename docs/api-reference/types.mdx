@@ -45,7 +45,7 @@ export interface MioOauth2TokenResponse {
 ```
 
 <ResponseField name="accessToken" type="string" required>
-Short-lived token for LLM calls.
+Short-lived token for Mio Context requests.
 </ResponseField>
 <ResponseField name="refreshToken" type="string" required>
 Use it to mint new access tokens.
@@ -60,10 +60,10 @@ Seconds until the access token expires.
 HTTP scheme for the `Authorization` header.
 </ResponseField>
 
-## Chat response schema
+## Context response schema
 
 ```typescript
 export type MioChatResponse = string;
 ```
 
-The SDK validates the `/chat` payload with Zod (`MioChatResponseSchema`) and returns the `content` string directly so you can render it without parsing.
+The SDK validates the context payload with Zod (`MioChatResponseSchema`) and returns the string directly so you can render it without parsing.
