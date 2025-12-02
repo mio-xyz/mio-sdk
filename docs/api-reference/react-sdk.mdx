@@ -31,10 +31,10 @@ export function Providers({ children }: { children: ReactNode }) {
 ```
 
 <ParamField body="config.clientId" type="string" required>
-Same as `Mio.init`.
+OAuth application ID from the Mio dashboard. Exposed to the browser.
 </ParamField>
 <ParamField body="config.redirectUrl" type="string" required>
-Redirect URL configured in Mio.
+Absolute URL where Mio sends users back after the connection flow. Must match the value configured in the Mio dashboard.
 </ParamField>
 <ParamField body="config.exchangeTokenUrl" type="string" required>
 Backend endpoint that swaps authorization codes for tokens.
@@ -44,22 +44,24 @@ Backend endpoint that swaps authorization codes for tokens.
 
 Returns state helpers for driving the OAuth flow and Mio Context lookups.
 
+#### Return values
+
 <ResponseField name="isLoading" type="boolean" required>
 True while a request (connect, callback, context, summary) is in flight.
 </ResponseField>
 <ResponseField name="error" type="string | null" required>
 Last error message produced by the hook.
 </ResponseField>
-<ResponseField name="connect" type="() => Promise<void>" required>
+<ResponseField name="connect" type="() => Promise <void>" required>
 Kicks off the OAuth flow. Redirects immediately.
 </ResponseField>
-<ResponseField name="handleMioCallback" type="() => Promise<MioOauth2TokenResponse>" required>
+<ResponseField name="handleMioCallback" type="() => Promise <MioOauth2TokenResponse>" required>
 Parses the authorization code and exchanges it via the configured backend.
 </ResponseField>
-<ResponseField name="getContext" type="(options: GetContextRequestOptions) => Promise<string>" required>
+<ResponseField name="getContext" type="(options: GetContextRequestOptions) => Promise <string>" required>
 Fetches Mio Context for the given user and query.
 </ResponseField>
-<ResponseField name="getContextSummary" type="(options: MioSDKOptions) => Promise<string | null>" required>
+<ResponseField name="getContextSummary" type="(options: MioSDKOptions) => Promise <string | null>" required>
 Fetches the latest stored Mio Context summary for the user.
 </ResponseField>
 
@@ -87,7 +89,10 @@ export function MioActions() {
         {isLoading ? 'Redirecting…' : 'Connect with Mio'}
       </button>
       <button
-        onClick={() => accessToken && getContext({ query: 'Greet the user', accessToken })}
+        onClick={() =>
+          accessToken &&
+          getContext({ query: 'Tell me about the user’s professional history', accessToken })
+        }
         disabled={!accessToken || isLoading}
       >
         Get Mio Context

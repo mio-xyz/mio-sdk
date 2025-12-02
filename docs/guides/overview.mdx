@@ -19,6 +19,19 @@ description: "Get a high-level look at how Mio connects the user experience, you
   Align on ownership early: the browser handles UX, the backend safeguards secrets, and Mio’s context layer returns ready-to-use insights about each user.
 </Tip>
 
+## OAuth & token lifecycle
+
+1. **Start the connection** – call `connect()` (or trigger the hosted button) to send the user into Mio’s consent flow.
+2. **Receive the authorization code** – Mio sends the browser back to your `redirectUrl` with a `code` query parameter.
+3. **Call your exchange endpoint** – the browser posts that code to your backend (for example `/api/exchange-token`).
+4. **Swap for tokens** – the backend calls `mio.exchangeCodeForTokens(code)` and stores the returned `refreshToken` securely (encrypted or in a secrets store).
+5. **Use short-lived access tokens** – pass the `accessToken` to `getContext` or `getContextSummary` whenever you need Mio Context.
+6. **Refresh daily** – access tokens expire after 24 hours; schedule calls to `mio.refreshTokens(refreshToken)` (or trigger them when you receive a 401) to mint fresh access tokens without asking users to reconnect.
+
+<Warning>
+  Access tokens last 24 hours. Keep refresh tokens server-side only and plan a background job or on-demand handler that calls `refreshTokens(refreshToken)` before they expire.
+</Warning>
+
 ## Responsibilities at a glance
 
 <Columns cols={3}>
@@ -43,7 +56,7 @@ description: "Get a high-level look at how Mio connects the user experience, you
     Use HTTPS for redirect URLs, token exchange routes, and any endpoint that proxies Mio traffic.
   </Accordion>
   <Accordion title="Handle refresh tokens carefully">
-    Encrypt refresh tokens at rest, rotate periodically, and delete them immediately if you revoke access in the Mio dashboard.
+    Encrypt refresh tokens at rest, rotate them periodically, and keep them server-side so you can request new access tokens without prompting the user again.
   </Accordion>
   <Accordion title="Guard your context surface">
     Apply rate limiting or authentication to any proxy endpoint that forwards Mio Context lookups on behalf of thin clients.

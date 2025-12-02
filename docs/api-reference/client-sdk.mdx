@@ -26,37 +26,25 @@ OAuth application ID from the Mio dashboard. Exposed to the browser.
 </ParamField>
 
 <ParamField body="redirectUrl" type="string" required>
-Absolute URL registered in Mio. The SDK uses it when redirecting users to `/auth`.
+Absolute URL where Mio sends users back after the connection flow. Must match the redirect URL registered in the Mio dashboard.
 </ParamField>
 
 <ParamField body="exchangeTokenUrl" type="string" required>
-Relative or absolute URL of your backend route that exchanges authorization codes for tokens.
+Backend endpoint that swaps authorization codes for tokens on behalf of the browser.
 </ParamField>
 
 ## Methods
 
 ### `connect(): Promise<void>`
 
-Redirects the browser to the Mio dashboard with the configured parameters. Use it inside a click handler.
+Redirects the browser into the Mio connection flow hosted on the Mio dashboard. Use it inside a click handler.
 
 ### `handleMioCallback(): Promise<MioOauth2TokenResponse>`
 
 Exposed via `useMio`. Reads the `code` query parameter, clears it from the URL, forwards it to `exchangeTokenUrl`, and returns the parsed tokens.
 
-<ResponseField name="accessToken" type="string" required>
-Bearer token used for subsequent `getContext` or `getContextSummary` calls.
-</ResponseField>
-<ResponseField name="refreshToken" type="string" required>
-Long-lived token that allows the backend to mint a new access token.
-</ResponseField>
-<ResponseField name="expiresIn" type="number" required>
-Lifetime of the access token (in seconds).
-</ResponseField>
-<ResponseField name="tokenType" type="string" default="Bearer">
-Auth scheme for downstream APIs.
-</ResponseField>
-<ResponseField name="idToken" type="string">
-OpenID token (JWT) that contains the user identity.
+<ResponseField name="response" type="MioOauth2TokenResponse" required>
+  [`MioOauth2TokenResponse`](/api-reference/types#token-response-schema) containing `accessToken`, `refreshToken`, `expiresIn`, `tokenType`, and `idToken`.
 </ResponseField>
 
 ### `exchangeCode(code: string): Promise<MioOauth2TokenResponse>`
@@ -66,6 +54,10 @@ Low-level helper that powers `handleMioCallback`. Call it manually if you want t
 <ParamField body="code" type="string" required>
 Authorization code received from Mio after the user approves access.
 </ParamField>
+
+<ResponseField name="response" type="MioOauth2TokenResponse" required>
+  [`MioOauth2TokenResponse`](/api-reference/types#token-response-schema) containing `accessToken`, `refreshToken`, `expiresIn`, `tokenType`, and `idToken`.
+</ResponseField>
 
 ### `getContext({ query, accessToken }): Promise<string>`
 
@@ -81,7 +73,7 @@ Token returned by `handleMioCallback` or your backend.
 <RequestExample>
 ```typescript
 const response = await Mio.getInstance().getContext({
-  query: 'Summarize the user profile',
+  query: 'Tell me about the user’s professional history',
   accessToken
 });
 ```
@@ -96,6 +88,12 @@ const response = await Mio.getInstance().getContext({
 ### `getContextSummary({ accessToken }): Promise<string | null>`
 
 Fetches the latest stored Mio Context summary for the user. Returns `null` when no summary exists yet.
+
+<ParamField body="accessToken" type="string" required>
+Token returned by `handleMioCallback` or your backend.
+</ParamField>
+
+#### Returns
 
 ## Error handling
 

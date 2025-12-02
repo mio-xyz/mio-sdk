@@ -22,19 +22,28 @@ export const mio = Mio.init({
 ### Config parameters
 
 <ParamField body="clientId" type="string" required>
-App identifier from Mio.
+OAuth application ID from the Mio dashboard.
 </ParamField>
 <ParamField body="redirectUrl" type="string" required>
-Must match the redirect configured in Mio.
+Absolute URL where Mio sends users back after the connection flow. Must match the redirect configured in Mio.
 </ParamField>
 <ParamField body="clientSecret" type="string" required>
-Only store on the server. Used to authenticate token exchanges.
+Confidential secret used only on the server when exchanging or refreshing tokens.
 </ParamField>
 ## Methods
 
 ### `exchangeCodeForTokens(code: string): Promise<MioOauth2TokenResponse>`
 
 Swaps an authorization code for tokens using the confidential client credentials.
+
+<ParamField body="code" type="string" required>
+Authorization code provided by the Mio auth workflow.
+</ParamField>
+
+<ResponseField name="response" type="MioOauth2TokenResponse" required>
+  [`MioOauth2TokenResponse`](/api-reference/types#token-response-schema) containing `accessToken`, `refreshToken`, `expiresIn`, `tokenType`, and `idToken`.
+</ResponseField>
+
 
 <RequestExample>
 ```typescript
@@ -71,13 +80,31 @@ Mint a new access token (and refresh token) without user interaction.
 The token you persisted from the previous exchange.
 </ParamField>
 
+<ResponseField name="response" type="MioOauth2TokenResponse" required>
+  [`MioOauth2TokenResponse`](/api-reference/types#token-response-schema) containing `accessToken`, `refreshToken`, `expiresIn`, `tokenType`, and `idToken`.
+</ResponseField>
+
+<Tip>
+  Access tokens expire after 24 hours. Schedule `refreshTokens(refreshToken)` before they expire (cron job, background worker, or on-demand when you receive a 401) and store the newly returned tokens.
+</Tip>
+
 ### `getContext({ query, accessToken }): Promise<string>`
 
 Server-side wrapper that shares the same implementation as the client version. Use it when you run long operations or batch context requests on the backend.
 
+#### Returns
+
+<ResponseField name="response" type="string" required>
+The refined and personalized user summary, based on your query
+</ResponseField>
+
 ### `getContextSummary({ accessToken }): Promise<string | null>`
 
-Retrieves the latest Mio Context summary object for the given user.
+Retrieves the latest Mio Context summary for the given user.
+
+<ResponseField name="response" type="string | null" required>
+Return the user summary if Mio has one, else return null.
+</ResponseField>
 
 ## Error matrix
 

@@ -20,7 +20,7 @@ export function MioButtons() {
 
   const ask = async () => {
     if (!accessToken) return;
-    await getContext({ query: 'Draft an onboarding message', accessToken });
+    await getContext({ query: 'Tell me about the user’s professional history', accessToken });
   };
 
   return (

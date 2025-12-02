@@ -7,16 +7,23 @@ description: "Connect your frontend and backend to Mio, exchange tokens securely
   This page shows you how to connect a user account to Mio, store tokens safely, and bring personalized Mio Context into your product. You will need Mio dashboard access, a redirect URL, Node.js 18+, and a server environment (Next.js route handler, Express API, etc.).
 </Info>
 
+### OAuth & token flow at a glance
+
+1. User clicks **Connect with Mio** and gets redirected to the Mio connection flow.
+2. Mio redirects back to your `redirectUrl` with a short-lived authorization code.
+3. The browser posts that code to your backend exchange endpoint.
+4. The backend calls `mio.exchangeCodeForTokens(code)`, stores the `refreshToken`, and returns the `accessToken` to the browser.
+5. You call `getContextSummary` (or `getContext`) with the access token.
+6. When the access token expires (after 24 hours), the backend calls `mio.refreshTokens(refreshToken)` to mint a new one without asking the user to reconnect.
+
 ## Ship a working flow in six steps
 
 <Steps>
   <Step title="Register your app">
-    Visit the <a href="https://dashboard.mio.xyz/en/developer" target="_blank" rel="noreferrer">Mio dashboard</a>, create an OAuth client, and copy the `clientId`, `clientSecret`, and redirect URL you intend to use locally. You need these values before any code changes.
+    Visit the <a href="https://dashboard.mio.xyz/developer" target="_blank" rel="noreferrer">Mio dashboard</a>, create an OAuth client, and copy the `clientId`, `clientSecret`, and redirect URL you intend to use locally. You need these values before any code changes.
   </Step>
 
-  <Step title="Install the SDK">
-    Add the Mio SDK once at the workspace root (monorepos included).
-
+  <Step title="Use @mio/mio-sdk as a project dependency">
     <CodeGroup>
 ```bash npm
 npm install @mio/mio-sdk
@@ -40,8 +47,70 @@ pnpm add @mio/mio-sdk
     </Warning>
   </Step>
 
+  <Step title="Initialize Mio in your frontend">
+    Initialize Mio once in your frontend so you can trigger the connection flow and later fetch Mio Context.
+
+<Tabs>
+<Tab title="React">
+
+```typescript app/providers.tsx
+'use client';
+
+import type { ReactNode } from 'react';
+import { MioProvider } from '@mio/mio-sdk/react';
+
+const mioConfig = {
+  clientId: process.env.NEXT_PUBLIC_MIO_CLIENT_ID!,
+  redirectUrl: `${process.env.NEXT_PUBLIC_APP_URL}/api/mio/callback`,
+  exchangeTokenUrl: '/api/exchange-token'
+};
+
+export function Providers({ children }: { children: ReactNode }) {
+  return <MioProvider config={mioConfig}>{children}</MioProvider>;
+}
+```
+
+</Tab>
+<Tab title="Vanilla HTML + JavaScript">
+
+```html index.html
+<button id="mio-connect">Connect with Mio</button>
+
+<script type="module">
+  import { Mio } from '@mio/mio-sdk/client';
+
+  const mio = Mio.init({
+    clientId: 'YOUR_MIO_CLIENT_ID',
+    redirectUrl: `${window.location.origin}/mio/callback`,
+    exchangeTokenUrl: '/api/exchange-token'
+  });
+
+  document
+    .getElementById('mio-connect')
+    ?.addEventListener('click', () => {
+      mio.connect();
+    });
+</script>
+```
+
+</Tab>
+</Tabs>
+
+    <Tip>
+      In React, `MioProvider` memoizes the underlying SDK. In non-React apps, keep the `Mio.init` call in a shared module so you reuse the same instance everywhere.
+    </Tip>
+  </Step>
+
   <Step title="Create the token exchange endpoint">
-    Initialize Mio on the server once, then reuse the singleton inside the route that swaps authorization codes for tokens.
+    Your frontend can never store the Mio client secret, so spin up a backend endpoint that trades authorization codes for tokens and hands the short-lived `accessToken` back to the browser.
+
+#### What is the exchange token endpoint for?
+
+It is the bridge between the redirect and your stored tokens:
+
+- The browser posts the `code` it received from Mio to this endpoint.
+- The backend calls `mio.exchangeCodeForTokens(code)` with your secret credentials.
+- You store the `refreshToken` securely, send the `accessToken` (or a session identifier) back to the browser, and use it to call Mio Context.
 
 <Tabs>
 <Tab title="Next.js route handler">
@@ -97,66 +166,16 @@ export default router;
     </Tip>
 
     <Warning>
+      Access tokens last 24 hours. Keep refresh tokens on the server and schedule `mio.refreshTokens(refreshToken)` so you always return a valid access token to the client.
+    </Warning>
+
+    <Warning>
       Ensure the redirect URL in your code matches the dashboard configuration exactly; otherwise the exchange fails with `invalid_grant`.
     </Warning>
   </Step>
 
-  <Step title="Initialize Mio in your frontend">
-    Initialize Mio once in your frontend so you can trigger the connection flow and later fetch Mio Context, whether you use React or not.
-
-<Tabs>
-<Tab title="React (with MioProvider)">
-
-```typescript app/providers.tsx
-'use client';
-
-import type { ReactNode } from 'react';
-import { MioProvider } from '@mio/mio-sdk/react';
-
-const mioConfig = {
-  clientId: process.env.NEXT_PUBLIC_MIO_CLIENT_ID!,
-  redirectUrl: `${process.env.NEXT_PUBLIC_APP_URL}/api/mio/callback`,
-  exchangeTokenUrl: '/api/exchange-token'
-};
-
-export function Providers({ children }: { children: ReactNode }) {
-  return <MioProvider config={mioConfig}>{children}</MioProvider>;
-}
-```
-
-</Tab>
-<Tab title="Vanilla HTML + JavaScript">
-
-```html index.html
-<button id="mio-connect">Connect with Mio</button>
-
-<script type="module">
-  import { Mio } from '@mio/mio-sdk/client';
-
-  const mio = Mio.init({
-    clientId: 'YOUR_MIO_CLIENT_ID',
-    redirectUrl: `${window.location.origin}/mio/callback`,
-    exchangeTokenUrl: '/api/exchange-token'
-  });
-
-  document
-    .getElementById('mio-connect')
-    ?.addEventListener('click', () => {
-      mio.connect();
-    });
-</script>
-```
-
-</Tab>
-</Tabs>
-
-    <Tip>
-      In React, `MioProvider` memoizes the underlying SDK. In non-React apps, keep the `Mio.init` call in a shared module so you reuse the same instance everywhere.
-    </Tip>
-  </Step>
-
   <Step title="Fetch Mio Context & personalize your experience">
-    Use Mio helpers to manage the OAuth flow, capture tokens, and request Mio Context (via `getContext` or `getContextSummary`) from either React or plain JavaScript.
+    Once you have an access token, call `getContextSummary` to pull ready-to-use context. The React example below uses `useMio`; adapt the same pattern for other frameworks or use `getContext` when you need a custom prompt.
 
 <Tabs>
 <Tab title="React">
@@ -168,7 +187,7 @@ import { useState } from 'react';
 import { useMio } from '@mio/mio-sdk/react';
 
 export default function HomePage() {
-  const { connect, handleMioCallback, getContext, getContextSummary, isLoading, error } = useMio();
+  const { connect, handleMioCallback, getContextSummary, isLoading, error } = useMio();
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [answer, setAnswer] = useState<string | null>(null);
 
@@ -181,14 +200,6 @@ export default function HomePage() {
   async function completeCallback() {
     const tokens = await handleMioCallback();
     setAccessToken(tokens.accessToken);
-  }
-
-  async function askMio() {
-    if (!accessToken) {
-      throw new Error('Connect first so we can get an access token');
-    }
-    const response = await getContext({ query: 'Summarize the user', accessToken });
-    setAnswer(response);
   }
 
   async function loadSummary() {
@@ -205,7 +216,6 @@ export default function HomePage() {
         {isLoading ? 'Connecting…' : 'Connect with Mio'}
       </button>
       <button onClick={completeCallback}>Handle callback</button>
-      <button onClick={askMio}>Get Mio Context</button>
       <button onClick={loadSummary}>Load user summary</button>
       {error ? <p>{error}</p> : null}
       {answer ? <pre>{answer}</pre> : null}
@@ -220,7 +230,6 @@ export default function HomePage() {
 ```html callback.html
 <section>
   <button id="mio-complete">Finish Mio connection</button>
-  <button id="mio-context">Get Mio Context</button>
   <button id="mio-summary">Get user summary</button>
 </section>
 
@@ -247,17 +256,6 @@ export default function HomePage() {
     window.history.replaceState({}, document.title, window.location.pathname);
   }
 
-  async function getMioContext() {
-    if (!accessToken) {
-      throw new Error('Connect first so we can get an access token');
-    }
-    const response = await mio.getContext({
-      query: 'Summarize the user for a welcome email',
-      accessToken
-    });
-    console.log('Mio Context', response);
-  }
-
   async function getSummary() {
     if (!accessToken) {
       throw new Error('Connect first so we can get an access token');
@@ -270,12 +268,6 @@ export default function HomePage() {
     .getElementById('mio-complete')
     ?.addEventListener('click', () => {
       void completeCallback();
-    });
-
-  document
-    .getElementById('mio-context')
-    ?.addEventListener('click', () => {
-      void getMioContext();
     });
 
   document
@@ -296,7 +288,7 @@ export default function HomePage() {
     </Warning>
 
     <Check>
-      Visit your redirect URL after Mio sends you back, call `handleMioCallback`, and confirm both `getContext` and `getContextSummary` log content in the console.
+      Run through the full flow, call `handleMioCallback`, and confirm `getContextSummary` logs personalized content in the console.
     </Check>
   </Step>
 </Steps>

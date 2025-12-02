@@ -12,24 +12,31 @@ export interface MioClientSDKInitConfig {
   exchangeTokenUrl: string;
 }
 
-export interface MioServerSDKInitConfig {
-  clientId: string;
-  redirectUrl: string;
+export interface MioServerSDKInitConfig
+  extends Pick<MioClientSDKInitConfig, 'clientId' | 'redirectUrl'> {
   clientSecret: string;
 }
 ```
 
+### Shared fields
+
 <ParamField path="clientId" type="string" required>
-Identifier of your Mio OAuth app.
+OAuth application ID from the Mio dashboard. Exposed to the browser.
 </ParamField>
 <ParamField path="redirectUrl" type="string" required>
-Exact redirect URL registered with Mio (including protocol).
+Absolute URL where Mio sends users back after the connection flow. Must match the redirect configured in the Mio dashboard.
 </ParamField>
+
+### Client-only fields
+
 <ParamField path="exchangeTokenUrl" type="string" required>
-Backend endpoint used by the client SDK.
+Backend endpoint that swaps authorization codes for tokens on behalf of the browser.
 </ParamField>
+
+### Server-only fields
+
 <ParamField path="clientSecret" type="string" required>
-Confidential secret used only on the server.
+Confidential secret used only on the server when exchanging or refreshing tokens.
 </ParamField>
 
 ## Token response schema
